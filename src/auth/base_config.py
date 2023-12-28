@@ -5,7 +5,7 @@ from src.auth.manager import get_user_manager
 from src.auth.model import User
 from src.config import SECRET_AUTH
 
-bearer_transport = BearerTransport(tokenUrl='auth/login')
+cookies_transport = CookieTransport(cookie_name='bonds', cookie_max_age=3600)
 
 
 def get_jwt_strategy() -> JWTStrategy:
@@ -15,7 +15,7 @@ def get_jwt_strategy() -> JWTStrategy:
 
 auth_backend = AuthenticationBackend(
     name='jwt',
-    transport=bearer_transport,
+    transport=cookies_transport,
     get_strategy=get_jwt_strategy
 )
 

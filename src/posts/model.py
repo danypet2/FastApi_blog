@@ -1,8 +1,10 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from src.database import Base
 
+from src.auth.model import User
+from src.database import Base
 
 
 class Post(Base):
@@ -13,3 +15,8 @@ class Post(Base):
     image = Column(String(1000))
     data_published = Column(DateTime(timezone=True), server_default=func.now())
     data_updated = Column(DateTime(timezone=True), onupdate=func.now())
+    author_id = Column(Integer, ForeignKey(User.id))
+    # author = relationship('User', backref='posts')
+
+
+
