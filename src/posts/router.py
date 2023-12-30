@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import insert, select, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.auth.base_config import fastapi_users
 from src.auth.model import User
 from src.database import get_async_session
 from src.posts.model import Post
 from src.posts.shemas import PostShemas
 from src.posts.utils import author_or_read_only, current_user
+from fastapi_cache.decorator import cache
 
-# from src.posts.utils import author_or_read_only
+
 
 router = APIRouter(
     prefix='/posts',
@@ -17,6 +17,7 @@ router = APIRouter(
 
 
 @router.get('')
+@cache(expire=180)
 async def get_posts(session: AsyncSession = Depends(get_async_session),
                     page: int = 0, limit: int = 50):
     try:

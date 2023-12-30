@@ -6,13 +6,11 @@ from src.auth.model import User
 from src.database import get_async_session
 from src.posts.model import Post
 
-
-
-
 current_user = fastapi_users.current_user()
 
+
 async def author_or_read_only(post_id: int, session: AsyncSession = Depends(get_async_session),
-                   user: User = Depends(current_user)):
+                              user: User = Depends(current_user)):
     post = await session.get(Post, post_id)
     if not post:
         raise HTTPException(status_code=404, detail='Пост не найден')

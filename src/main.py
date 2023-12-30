@@ -1,14 +1,12 @@
-import fastapi_users.router
 from fastapi import FastAPI, Depends
-from sqlalchemy import insert
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
 from src.auth.base_config import fastapi_users
 from src.auth.base_config import auth_backend
 from src.auth.shemas import UserRead, UserCreate
-from src.posts.shemas import PostShemas
-from src.database import get_async_session
-from src.posts.model import Post
 from src.posts.router import router as router_post
+from redis import asyncio as aioredis
+
 
 app = FastAPI(title='social_netw')
 
@@ -26,3 +24,12 @@ app.include_router(
     prefix="/auth",
     tags=["Auth"],
 )
+
+
+@app.on_event("startup")
+async def startup():
+    redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+
+
+
