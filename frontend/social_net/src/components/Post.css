@@ -1,0 +1,42 @@
+.container {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.card {
+    border: 15px solid #5EBEC4;
+    border-radius: 13px;
+    padding: 20px;
+    width: 69%;
+    height: 35rem;
+    background-color: white;
+    position: relative;
+}
+
+.date {
+    display: inline-block;
+    text-align: right;
+    margin: 5%;
+    margin-top: 85%;
+    float: right;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin-right: 8%;
+
+}
+
+.name {
+    display: inline-block;
+    text-align: left;
+    margin: 5%;
+    margin-top: 85%;
+    position: absolute;
+    bottom: 0;
+}
+
