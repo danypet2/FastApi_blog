@@ -6,7 +6,7 @@ from src.auth.model import User
 from src.database import get_async_session
 from src.posts.model import Post
 
-current_user = fastapi_users.current_user()
+current_user = fastapi_users.current_user(verified=True)
 
 
 async def author_or_read_only(post_id: int, session: AsyncSession = Depends(get_async_session),

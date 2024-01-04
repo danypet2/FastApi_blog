@@ -7,11 +7,9 @@ from src.auth.shemas import UserRead, UserCreate
 from src.posts.router import router as router_post
 from redis import asyncio as aioredis
 
-
 app = FastAPI(title='social_netw')
 
 app.include_router(router_post)
-
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend),
@@ -25,11 +23,20 @@ app.include_router(
     tags=["Auth"],
 )
 
+app.include_router(
+    fastapi_users.get_verify_router(UserRead),
+    prefix="/auth",
+    tags=["Auth"],
+)
+
+app.include_router(
+    fastapi_users.get_reset_password_router(),
+    prefix='/auth',
+    tags=['Auth']
+)
+
 
 @app.on_event("startup")
 async def startup():
     redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
-
-
-

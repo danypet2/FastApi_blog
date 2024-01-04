@@ -3,8 +3,6 @@ from fastapi_users.db import SQLAlchemyBaseUserTable
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from sqlalchemy import Column, String, Integer, DateTime, func, JSON, ForeignKey, Boolean
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import relationship
-
 from src.database import Base, get_async_session
 
 
