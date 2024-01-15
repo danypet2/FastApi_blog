@@ -1,21 +1,32 @@
 .container {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     flex-direction: column;
     justify-content: center;
+    flex-grow: 1;
     align-items: center;
-    gap: 20px;
+    gap: 60px;
     padding: 20px;
+    /*margin-right: 100%;*/
+
 }
+
+.title {
+    text-align: center;
+    font-size: large;
+    font-size: 25px;
+}
+
 
 .card {
     border: 15px solid #5EBEC4;
     border-radius: 13px;
     padding: 20px;
-    width: 69%;
-    height: 35rem;
+    width: 22rem;
+    height: 32rem;
     background-color: white;
     position: relative;
+
 }
 
 .date {

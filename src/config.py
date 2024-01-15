@@ -19,4 +19,4 @@ SMTP_PORT = os.environ.get('SMTP_PORT')
 SMTP_USER = os.environ.get('SMTP_USER')
 SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD')
 
-SECRET_AUTH = os.environ.get('SECRET_AUTH')
+SECRET_KEY = os.environ.get('SECRET_KEY')

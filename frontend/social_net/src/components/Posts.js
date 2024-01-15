@@ -2,16 +2,14 @@ import './Posts.css'
 import Post from "./Post";
 
 const Posts = (props) => {
-    {props.data.length > 0 ? props.data.map(post =>
-                console.log(post)
-
-            ) : console.log(0)}
+    if (!props.data || props.data.length === 0) {
+        return <div><p>Нет постов</p></div>
+    }
     return (
 
         <div className="container">
             {props.data.length > 0 ? props.data.map(post =>
-                <Post data={post}></Post>
-
+                <Post data={post.post}></Post>
             ) : <div>Нет постов</div>}
 
         </div>

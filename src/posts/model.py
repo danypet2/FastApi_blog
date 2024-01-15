@@ -16,7 +16,7 @@ class Post(Base):
     data_published = Column(DateTime(timezone=True), server_default=func.now())
     data_updated = Column(DateTime(timezone=True), onupdate=func.now())
     author_id = Column(Integer, ForeignKey(User.id))
-    # author = relationship('User', backref='posts')
+
 
 
 

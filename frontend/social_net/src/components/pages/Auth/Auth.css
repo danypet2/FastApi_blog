@@ -1,0 +1,57 @@
+.form-container {
+  width: 300px;
+  margin: 0 auto;
+  text-align: center;
+  margin-top: 5rem;
+
+}
+
+.form-toggle {
+  margin-bottom: 15px;
+}
+
+.form-toggle button {
+  padding: 10px 20px;
+  margin: 0 5px;
+  border: none;
+  background-color: #5EBEC4;
+  color: white;
+  cursor: pointer;
+}
+
+.form {
+  display: block;
+  margin-top: 20px;
+}
+
+.form h2 {
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form input[type="text"],
+.form input[type="password"],
+.form input[type="email"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-sizing: border-box;
+  margin-top: 5px;
+}
+.form button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #5EBEC4;
+  color: white;
+  cursor: pointer;
+}
+

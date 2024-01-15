@@ -1,12 +1,10 @@
 from fastapi import Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.auth.base_config import fastapi_users
 from src.auth.model import User
 from src.database import get_async_session
 from src.posts.model import Post
 
-current_user = fastapi_users.current_user(verified=True)
 
 
 async def author_or_read_only(post_id: int, session: AsyncSession = Depends(get_async_session),
