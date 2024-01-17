@@ -4,7 +4,7 @@ from src.celery_app import celery
 from src.config import SMTP_PORT, SMTP_HOST, SMTP_USER, SMTP_PASSWORD
 
 
-def email_verification(username: str, user_email: str, token: str):
+def email_verification(user_email: str, token: str):
     email = EmailMessage()
     email['Subject'] = 'Подтвердите почту!'
     email['From'] = SMTP_USER
@@ -12,7 +12,7 @@ def email_verification(username: str, user_email: str, token: str):
 
     email.set_content(
         '<div>'
-        f'<h1 style="color: black;">Здравствуйте, {username}, Подтвердите вашу почту! Перейдите по следующей ссылки: <p>http://127.0.0.1:8000/auth/verify?{token}</p>😊</h1>'
+        f'<h1 style="color: black;">Здравствуйте, Подтвердите вашу почту! Ваш проверочный код: </p>{token}</p></p>😊</h1>'
         '</div>',
         subtype='html'
     )
@@ -34,7 +34,7 @@ def email_after_registration(username: str, user_email: str):
     return email
 
 
-def email_after_verify(username: str, user_email: str):
+def email_after_verify( user_email: str):
     email = EmailMessage()
     email['Subject'] = 'Вы подтвердили адрес электронной почты!!'
     email['From'] = SMTP_USER
@@ -42,7 +42,7 @@ def email_after_verify(username: str, user_email: str):
 
     email.set_content(
         '<div>'
-        f'<h1 style="color: black;">Здравствуйте, {username}, Вы успешно подтвердили адрес электронной почты! И теперь вам доступен весь функционал сайта!</h1>'
+        f'<h1 style="color: black;">Здравствуйте, вы успешно подтвердили адрес электронной почты! И теперь вам доступен весь функционал сайта!</h1>'
         '</div>',
         subtype='html'
     )
@@ -66,8 +66,8 @@ def email_forgot_password(username: str, user_email: str, token: str):
 
 
 @celery.task
-def send_email_verification(username: str, user_email: str, token: str):
-    email = email_verification(username, user_email, token)
+def send_email_verification(user_email: str, token: int):
+    email = email_verification(user_email, token)
     with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT) as server:
         server.login(SMTP_USER, SMTP_PASSWORD)
         server.send_message(email)
@@ -80,18 +80,18 @@ def send_email_forgot_password(username: str, user_email: str, token: str):
         server.login(SMTP_USER, SMTP_PASSWORD)
         server.send_message(email)
 
+
 @celery.task
-def send_email_after_registr(username: str, user_email: str):
+def send_email_after_register(username: str, user_email: str):
     email = email_after_registration(username, user_email)
     with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT) as server:
         server.login(SMTP_USER, SMTP_PASSWORD)
         server.send_message(email)
 
 
-
 @celery.task
-def send_email_after_verify(username: str, user_email: str):
-    email = email_after_verify(username, user_email)
+def send_email_after_verify(user_email: str):
+    email = email_after_verify(user_email)
     with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT) as server:
         server.login(SMTP_USER, SMTP_PASSWORD)
         server.send_message(email)

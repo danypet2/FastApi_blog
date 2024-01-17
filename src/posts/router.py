@@ -1,7 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import insert, select, delete, update, join
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.auth.jwt import get_current_user
 from src.auth.model import User
+from src.auth.shemas import UserRead
+from src.auth.utils import user_post
 from src.database import get_async_session
 from src.posts.model import Post
 from src.posts.shemas import PostShemas
@@ -44,32 +48,39 @@ async def get_post(post_id: int, session: AsyncSession = Depends(get_async_sessi
         raise HTTPException(status_code=400, detail='Unknown error')
 
 
-# @router.post('/add_post')
-# async def add_post(new_post: PostShemas, session: AsyncSession = Depends(get_async_session),
-#                    ):
-#     try:
-#         stmt = insert(Post).values(title=new_post.title, content=new_post.content, image=new_post.image,
-#                                    author_id=user.id)
-#         await session.execute(stmt)
-#         await session.commit()
-#         return {'status': 200, 'data': new_post}
-#     except:
-#         raise HTTPException(status_code=400, detail='Unknown error')
-#
-#
-# @router.delete('/{post_id}')
-# async def delete_post(post_id: int, session: AsyncSession = Depends(get_async_session),
-#                       ):
-#     stmt = delete(Post).where(Post.id == post_id).where(Post.author_id == user.id)
-#     await session.execute(stmt)
-#     await session.commit()
-#     return {'status': 200}
-#
-#
-# @router.put('/{post_id}')
-# async def put_post(post_id: int, new_post: PostShemas, session: AsyncSession = Depends(get_async_session),
-#                   ):
-#     stmt = update(Post).where(Post.id == post_id).where(Post.author_id == user.id).values(**new_post.dict())
-#     await session.execute(stmt)
-#     await session.commit()
-#     return {'status': 200, 'data': new_post}
+@router.post('/add_post')
+async def add_post(new_post: PostShemas, session: AsyncSession = Depends(get_async_session),
+                    current_user: UserRead = Depends(get_current_user)):
+    try:
+        stmt = insert(Post).values(title=new_post.title, content=new_post.content, image=new_post.image,
+                                   author_id=current_user.id)
+        await session.execute(stmt)
+        await session.commit()
+        return {'status': 200, 'data': new_post}
+    except:
+        raise HTTPException(status_code=400, detail='Unknown error')
+
+
+@router.delete('/{post_id}')
+async def delete_post(post_id: int, session: AsyncSession = Depends(get_async_session),
+                       current_user: UserRead = Depends(get_current_user),
+                       auth_check: str = Depends(user_post)):
+    try:
+        stmt = delete(Post).where(Post.id == post_id).where(Post.author_id == current_user.id)
+        await session.execute(stmt)
+        await session.commit()
+        return {'status': 200}
+    except:
+        raise HTTPException(status_code=400, detail='Неизвестная ошибка')
+
+
+@router.put('/{post_id}')
+async def put_post(post_id: int, new_post: PostShemas, session: AsyncSession = Depends(get_async_session),
+                   current_user: UserRead = Depends(get_current_user), auth_check: str = Depends(user_post)):
+    try:
+        stmt = update(Post).where(Post.id == post_id).where(Post.author_id == current_user.id).values(**new_post.dict())
+        await session.execute(stmt)
+        await session.commit()
+        return {'status': 200, 'data': new_post}
+    except:
+        raise HTTPException(status_code=400, detail='Неизвестная ошибка')

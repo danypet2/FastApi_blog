@@ -30,10 +30,10 @@ const Auth = () => {
     }
 
 
-    const [inputEmailValue, setInputEmailValue] = useState('');
+    const [inputUsernameValue, setInputUsernameValue] = useState('');
     const [inputPassValue, setInputPassValue] = useState('')
-    const handleInputEmailChange = (e) => {
-        setInputEmailValue(e.target.value);
+    const handleInputUsernameChange = (e) => {
+        setInputUsernameValue(e.target.value);
     }
 
     const handleInputPassChange = (e) => {
@@ -42,7 +42,7 @@ const Auth = () => {
     const onSudmitEntry = (e) => {
         e.preventDefault()
         const postData = {
-            email: inputEmailValue, password: inputPassValue
+            username: inputUsernameValue, password: inputPassValue
         }
         requestApiLogin(postData)
     }
@@ -55,9 +55,9 @@ const Auth = () => {
         <form id="login-form" className="form" onSubmit={onSudmitEntry}>
             <h2>Вход</h2>
             <div className="form-group">
-                <label htmlFor="login-username">Email пользователя</label>
-                <input type="text" id="login-username" name="login-username" value={inputEmailValue}
-                       onChange={handleInputEmailChange} required/>
+                <label htmlFor="login-username">Имя пользователя</label>
+                <input type="text" id="login-username" name="login-username" value={inputUsernameValue}
+                       onChange={handleInputUsernameChange} required/>
             </div>
             <div className="form-group">
                 <label htmlFor="login-password">Пароль</label>

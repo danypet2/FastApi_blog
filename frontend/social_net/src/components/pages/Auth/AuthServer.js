@@ -4,7 +4,7 @@ export const requestApiLogin = (array) => {
 
     axios.post('http://127.0.0.1:8000/auth/login', {
         grant_type: '',
-        username: array.email,
+        username: array.username,
         password: array.password,
         scope: '',
         client_id: '',

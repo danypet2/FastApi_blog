@@ -17,7 +17,7 @@ class UserCreate(BaseModel):
     email: str
     username: str
     hashed_password: str
-    is_active: Optional[bool] = True
-    is_superuser: Optional[bool] = False
-    is_verified: Optional[bool] = False
+    # is_active: Optional[bool] = True
+    # is_superuser: Optional[bool] = False
+    # is_verified: Optional[bool] = False
 
