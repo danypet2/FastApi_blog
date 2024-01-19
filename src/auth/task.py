@@ -57,7 +57,24 @@ def email_forgot_password(username: str, user_email: str, token: str):
 
     email.set_content(
         '<div>'
-        f'<h1 style="color: black;">Здравствуйте, {username}, Подтвердите сброс вашего пароля! Перейдите по следующей ссылки: <p>http://127.0.0.1:8000/auth/reset-password?{token}</p>😊</h1>'
+        f'<h1 style="color: black;">Здравствуйте, {username}, Подтвердите сброс вашего пароля! Ваш код: <p>{token}</p></p>😊</h1>'
+        '</div>',
+
+        subtype='html'
+    )
+    return email
+
+
+
+def after_reset_password(user_email: str):
+    email = EmailMessage()
+    email['Subject'] = 'Ваш пароль был сброшен'
+    email['From'] = SMTP_USER
+    email['To'] = user_email
+
+    email.set_content(
+        '<div>'
+        f'<h1 style="color: black;"><p>Ваш пароль был успешно сброшен, если это не вы, то обратитесь по адресу .........</p>😊</h1>'
         '</div>',
 
         subtype='html'
@@ -92,6 +109,14 @@ def send_email_after_register(username: str, user_email: str):
 @celery.task
 def send_email_after_verify(user_email: str):
     email = email_after_verify(user_email)
+    with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT) as server:
+        server.login(SMTP_USER, SMTP_PASSWORD)
+        server.send_message(email)
+
+
+@celery.task
+def send_email_after_reset_password(user_email: str):
+    email = after_reset_password(user_email)
     with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT) as server:
         server.login(SMTP_USER, SMTP_PASSWORD)
         server.send_message(email)

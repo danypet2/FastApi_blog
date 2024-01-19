@@ -13,7 +13,8 @@ from src.auth.model import User
 from src.auth.shemas import UserCreate, UserRead
 from src.auth.utils import random_code
 from src.database import get_async_session
-from src.auth.task import send_email_after_register, send_email_verification, send_email_after_verify
+from src.auth.task import send_email_after_register, send_email_verification, send_email_after_verify, \
+    email_forgot_password, send_email_forgot_password, send_email_after_reset_password
 
 router = APIRouter(
     prefix='/auth',
@@ -43,7 +44,7 @@ async def register_user(data: UserCreate, session: AsyncSession = Depends(get_as
         return {'status': 200, 'detail': 'Регистрация прошла успешно'}
 
     except DBAPIError:
-        raise HTTPException(status_code=400, detail='Неизвестная ошибка')
+        raise HTTPException(status_code=500, detail='Неизвестная ошибка')
 
 
 @router.post('/login')
@@ -95,7 +96,6 @@ async def refresh(refresh_token: str):
         )
 
 
-
 @router.post('/verify_email')
 async def verify_email(email_user: str, session: AsyncSession = Depends(get_async_session)):
     try:
@@ -109,8 +109,7 @@ async def verify_email(email_user: str, session: AsyncSession = Depends(get_asyn
 
 
     except:
-        raise HTTPException(status_code=400)
-
+        raise HTTPException(status_code=500)
 
 
 @router.post('/verify_code')
@@ -127,5 +126,35 @@ async def verify_code(email: str, code: int, session: AsyncSession = Depends(get
             return {'status': 400}
 
     except:
-        raise HTTPException(status_code=400)
+        raise HTTPException(status_code=500)
+
+
+@router.post('/forgot_password')
+async def forgot_password(email: str, session: AsyncSession = Depends(get_async_session)):
+    try:
+        stmt = select(User).where(User.email == email)
+        result = await session.execute(stmt)
+        result = result.scalar()
+        if not result:
+            raise HTTPException(status_code=400, detail='Email не найден')
+        random_code(email)
+        send_email_forgot_password.delay(result.username, result.email, redis_connect.get(email).decode())
+    except:
+        raise HTTPException(status_code=500, detail='Неизвестная ошибка')
+
+
+@router.post('/reset_password')
+async def reset_password(email: str, new_password: str, code: int, session: AsyncSession = Depends(get_async_session)):
+    try:
+        if code == int(redis_connect.get(email).decode()):
+            redis_connect.delete(email)
+            stmt = update(User).where(User.email == email).values(hashed_password=get_password_hash(new_password))
+            await session.execute(stmt)
+            await  session.commit()
+            send_email_after_reset_password.delay(email)
+            return {'status': 200, 'detail': 'Ваш пароль успешно сброшен'}
+        else:
+            return dict(status_code=400, detail='Неправильный код доступа')
+    except:
+        raise HTTPException(status_code=500, detail='Неизвестная ошибка')
 
