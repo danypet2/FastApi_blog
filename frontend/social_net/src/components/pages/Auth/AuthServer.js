@@ -1,4 +1,5 @@
 import axios from "axios";
+import {type} from "@testing-library/user-event/dist/type";
 
 export const requestApiLogin = (array) => {
 
@@ -26,8 +27,31 @@ export const requestApiLogin = (array) => {
 }
 
 export const requestApiRegister = (array) => {
-    console.log(array + '123123123asdsda')
-    // Дописать логику обращения к Api
+    axios.post('http://127.0.0.1:8000/auth/register', {
+        email: array.email,
+        username: array.username,
+        hashed_password: array.password,
+
+    },)
+        .then(response => {
+            if (response.status == 200) {
+                array.setIsSuccess(true)
+                axios.post('http://127.0.0.1:8000/auth/verify_email', {
+                    email_user: array.email
+                })
+                    .then(response => {
+                        console.log(response)
+                    })
+                    .catch(error => {
+                        console.log(error + '123123123123123123123123')
+                    })
+
+
+            }
+        })
+        .catch(error => {
+            console.log(error)
+        })
 }
 
 

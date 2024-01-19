@@ -97,7 +97,7 @@ async def refresh(refresh_token: str):
 
 
 @router.post('/verify_email')
-async def verify_email(email_user: str, session: AsyncSession = Depends(get_async_session)):
+async def verify_email(email_user: dict, session: AsyncSession = Depends(get_async_session)):
     try:
         stmt = select(User).where(User.email == email_user)
         result = await session.execute(stmt)
