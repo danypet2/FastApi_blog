@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Depends
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
+from starlette.staticfiles import StaticFiles
+
 from src.posts.router import router as router_post
 from redis import asyncio as aioredis
 from fastapi.middleware.cors import CORSMiddleware

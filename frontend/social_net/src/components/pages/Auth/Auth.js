@@ -51,7 +51,7 @@ const Auth = () => {
 
     return (
         <div>
-            {isSuccess ? (<VerifyRegistration></VerifyRegistration>) :
+            {isSuccess ? (<VerifyRegistration props={emailRegisterValue}></VerifyRegistration>) :
                 (
             <div className="form-container">
                 <div className="form-toggle">

@@ -1,5 +1,6 @@
 import axios from "axios";
-import {type} from "@testing-library/user-event/dist/type";
+
+
 
 export const requestApiLogin = (array) => {
 
@@ -26,6 +27,7 @@ export const requestApiLogin = (array) => {
         });
 }
 
+
 export const requestApiRegister = (array) => {
     axios.post('http://127.0.0.1:8000/auth/register', {
         email: array.email,
@@ -34,11 +36,15 @@ export const requestApiRegister = (array) => {
 
     },)
         .then(response => {
-            if (response.status == 200) {
+            console.log('first - okey')
+            if (response.status === 200) {
                 array.setIsSuccess(true)
+
+
                 axios.post('http://127.0.0.1:8000/auth/verify_email', {
-                    email_user: array.email
-                })
+                        email: array.email
+                    }
+                )
                     .then(response => {
                         console.log(response)
                     })
@@ -50,8 +56,22 @@ export const requestApiRegister = (array) => {
             }
         })
         .catch(error => {
-            console.log(error)
+
+            console.log(error + 'not first okey')
         })
 }
 
+export const verificationEmail = (data) => {
+    axios.post('http://127.0.0.1:8000/auth/verify_code', {
+            email: data.email,
+            code: data.code
+        }
+    )
+        .then(response => {
+            console.log('okey')
+        })
+        .catch(error => {
+            console.log(error)
+        })
 
+}

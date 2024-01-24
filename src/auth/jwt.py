@@ -10,7 +10,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.model import User
-from src.auth.shemas import UserRead
 from src.config import SECRET_KEY
 from src.database import get_async_session
 
@@ -59,7 +58,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), session: AsyncSe
         decoded_token = decode_access_token(token)
         expiration_time = datetime.fromtimestamp(decoded_token['exp'])
         if expiration_time < datetime.utcnow():
-             raise HTTPException(
+            raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token expired",
                 headers={"WWW-Authenticate": "Bearer"},
@@ -71,14 +70,13 @@ async def get_current_user(token: str = Depends(oauth2_scheme), session: AsyncSe
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-
     current_user = select(User).where(User.username == decoded_token['sub'])
     result = await session.execute(current_user)
     result = result.scalar()
 
     if result is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                        detail="Could not find user")
-    if result.is_verified == False:
+                            detail="Could not find user")
+    if not result.is_verified:
         raise HTTPException(status_code=400, detail='Вы не верифицированы')
     return result

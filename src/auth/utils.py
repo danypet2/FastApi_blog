@@ -1,7 +1,6 @@
 import random
 import redis
 from fastapi import Depends, HTTPException
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.jwt import get_current_user

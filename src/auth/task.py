@@ -34,7 +34,7 @@ def email_after_registration(username: str, user_email: str):
     return email
 
 
-def email_after_verify( user_email: str):
+def email_after_verify(user_email: str):
     email = EmailMessage()
     email['Subject'] = 'Вы подтвердили адрес электронной почты!!'
     email['From'] = SMTP_USER
@@ -63,7 +63,6 @@ def email_forgot_password(username: str, user_email: str, token: str):
         subtype='html'
     )
     return email
-
 
 
 def after_reset_password(user_email: str):
