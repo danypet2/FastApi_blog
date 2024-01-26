@@ -50,7 +50,7 @@ async def get_post(post_id: int, session: AsyncSession = Depends(get_async_sessi
 
 @router.post('/add_post')
 async def add_post(new_post: PostShemas, session: AsyncSession = Depends(get_async_session),
-                    current_user: UserRead = Depends(get_current_user)):
+                   current_user=Depends(get_current_user)):
     try:
         stmt = insert(Post).values(title=new_post.title, content=new_post.content, image=new_post.image,
                                    author_id=current_user.id)
@@ -63,8 +63,8 @@ async def add_post(new_post: PostShemas, session: AsyncSession = Depends(get_asy
 
 @router.delete('/{post_id}')
 async def delete_post(post_id: int, session: AsyncSession = Depends(get_async_session),
-                       current_user: UserRead = Depends(get_current_user),
-                       auth_check: str = Depends(user_post)):
+                      current_user=Depends(get_current_user),
+                      auth_check=Depends(user_post)):
     try:
         stmt = delete(Post).where(Post.id == post_id).where(Post.author_id == current_user.id)
         await session.execute(stmt)
@@ -76,7 +76,7 @@ async def delete_post(post_id: int, session: AsyncSession = Depends(get_async_se
 
 @router.put('/{post_id}')
 async def put_post(post_id: int, new_post: PostShemas, session: AsyncSession = Depends(get_async_session),
-                   current_user: UserRead = Depends(get_current_user), auth_check: str = Depends(user_post)):
+                   current_user=Depends(get_current_user), auth_check=Depends(user_post)):
     try:
         stmt = update(Post).where(Post.id == post_id).where(Post.author_id == current_user.id).values(**new_post.dict())
         await session.execute(stmt)
