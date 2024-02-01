@@ -14,13 +14,7 @@ def random_code(email_user, expire_minutes=5):
     email = email_user
     redis_connect.set(email, code, ex=expire_minutes*60)
 
-async def user_post(post_id: int, session: AsyncSession = Depends(get_async_session),
-                    current_user: UserRead = Depends(get_current_user)):
-    post = await session.get(Post, post_id)
-    if not post:
-        raise HTTPException(status_code=400, detail='Данный пост не найден')
-    if not (post.author_id == current_user.id):
-        raise HTTPException(status_code=400, detail='Вы не являетесь автором этого поста')
+
 
 
 redis_connect = redis.Redis(host='localhost', port=6379, db=0)
