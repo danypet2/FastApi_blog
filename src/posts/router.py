@@ -13,7 +13,7 @@ from src.auth.shemas import UserRead
 from src.image.utils import generate_filename, save_photo, delete_photo, get_images_post
 from src.database import get_async_session
 from src.posts.model import Post, Image
-from src.posts.shemas import PostShemas
+from src.posts.shemas import PostShemas, PostImageResponse
 from fastapi_cache.decorator import cache
 from src.posts.utils import user_post
 
@@ -23,12 +23,12 @@ router = APIRouter(
 )
 
 
-@router.get('')
+@router.get('', response_model=PostImageResponse)
 @cache(expire=1)
 async def get_posts(session: AsyncSession = Depends(get_async_session),
                     page: int = 0, limit: int = 50):
     try:
-        stmt = select(Post, User.username, Image.filename).join(User, Post.author_id == User.id).join(Image,
+        stmt = select(Post, User.username, Image.filename).join(User, Post.author_id == User.id).outerjoin(Image,
                                                                                                       Image.post_id == Post.id).offset(
             page).limit(limit)
         result = await session.execute(stmt)
@@ -43,7 +43,7 @@ async def get_posts(session: AsyncSession = Depends(get_async_session),
         raise HTTPException(status_code=404, detail='Неизвестная ошибка')
 
 
-@router.get('/{post_id}')
+@router.get('/{post_id}', response_model=PostImageResponse)
 async def get_post(post_id: int, session: AsyncSession = Depends(get_async_session),
                    ):
     post = await session.get(Post, post_id)
@@ -51,7 +51,7 @@ async def get_post(post_id: int, session: AsyncSession = Depends(get_async_sessi
         raise HTTPException(status_code=404, detail='Пост не найден')
     try:
         stmt = select(Post, User.username, Image.filename).where(Post.id == post_id).join(User,
-                                                                                          Post.author_id == User.id).join(
+                                                                                          Post.author_id == User.id).outerjoin(
             Image, Image.post_id == Post.id)
         result = await session.execute(stmt)
         data = {}
