@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from starlette.staticfiles import StaticFiles
-
+from src.comment.router import router as router_comment
 from src.posts.router import router as router_post
 from redis import asyncio as aioredis
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,7 +15,7 @@ app = FastAPI(title='social_netw')
 
 app.include_router(router_post)
 app.include_router(auth_router)
-
+app.include_router(router_comment)
 
 
 @app.on_event("startup")

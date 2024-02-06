@@ -10,12 +10,15 @@ from starlette.responses import FileResponse
 from src.auth.jwt import get_current_user
 from src.auth.model import User
 from src.auth.shemas import UserRead
+from src.comment.model import Comment
 from src.image.utils import generate_filename, save_photo, delete_photo, get_images_post
 from src.database import get_async_session
 from src.posts.model import Post, Image
-from src.posts.shemas import PostShemas, PostImageResponse
+from src.posts.shemas import PostShemas, PostImageResponse, SuccessResponse
 from fastapi_cache.decorator import cache
 from src.posts.utils import user_post
+from src.comment.shemas import ListCommentResponse
+
 
 router = APIRouter(
     prefix='/posts',
@@ -65,7 +68,7 @@ async def get_post(post_id: int, session: AsyncSession = Depends(get_async_sessi
         raise HTTPException(status_code=400, detail='Неизвестная ошибка')
 
 
-@router.post('/add_post')
+@router.post('/add_post', response_model=SuccessResponse)
 async def add_post(files: List[UploadFile] = File(), new_post: PostShemas = Depends(),
                    session: AsyncSession = Depends(get_async_session),
                    current_user=Depends(get_current_user)):
@@ -74,6 +77,7 @@ async def add_post(files: List[UploadFile] = File(), new_post: PostShemas = Depe
                                    author_id=current_user.id)
         result_id = await session.execute(stmt)
         result_id = result_id.inserted_primary_key[0]
+
         for index, element in enumerate(files):
             if not element.filename:
                 break
@@ -82,18 +86,22 @@ async def add_post(files: List[UploadFile] = File(), new_post: PostShemas = Depe
             stmt = insert(Image).values(filename=filename, post_id=result_id)
             await session.execute(stmt)
         await session.commit()
-        return {'status': 200, 'data': 1212}
+        return {'status': 200}
 
     except:
         raise HTTPException(status_code=400, detail='Неизвестная ошибка')
 
 
-@router.delete('/{post_id}', dependencies=[Depends(user_post)])
+@router.delete('/{post_id}', dependencies=[Depends(user_post)], response_model=SuccessResponse)
 async def delete_post(post_id: int, session: AsyncSession = Depends(get_async_session),
                       current_user: UserRead = Depends(get_current_user),
                       images_post: list = Depends(get_images_post)):
-    try:
+
         delete_photo(images_post)
+
+        stmt = delete(Comment).where(Comment.post_id == post_id)
+        await session.execute(stmt)
+
         stmt_image = delete(Image).where(Image.post_id == post_id)
         await session.execute(stmt_image)
 
@@ -102,11 +110,10 @@ async def delete_post(post_id: int, session: AsyncSession = Depends(get_async_se
 
         await session.commit()
         return {'status': 200}
-    except:
-        raise HTTPException(status_code=400, detail='Неизвестная ошибка')
 
 
-@router.put('/{post_id}', dependencies=[Depends(user_post)])
+
+@router.put('/{post_id}', dependencies=[Depends(user_post)], response_model=SuccessResponse)
 async def put_post(post_id: int, files: List[UploadFile] = File(...), new_post: PostShemas = Depends(),
                    session: AsyncSession = Depends(get_async_session),
                    current_user: UserRead = Depends(get_current_user),

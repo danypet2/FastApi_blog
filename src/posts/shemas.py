@@ -28,3 +28,7 @@ class PostImage(BaseModel):
 class PostImageResponse(BaseModel):
     status: int
     data: List[PostImage]
+
+
+class SuccessResponse(BaseModel):
+    status: int = 200

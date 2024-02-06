@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from src.auth.model import User
+
 from src.database import Base
 
 
