@@ -1,8 +1,10 @@
+import time
+
 from fastapi import Depends, HTTPException
 from fastapi.routing import APIRouter
 from sqlalchemy import insert, select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from fastapi_cache.decorator import cache
 from src.auth.model import User
 from src.comment.utils import author_or_read_only, post_or_not
 from src.auth.jwt import get_current_user
@@ -29,9 +31,11 @@ async def add_comment(post_id: int, comment: CommentShemas, session: AsyncSessio
 
 
 @router.get('/{post_id}', response_model=ListCommentResponse)
-async def get_comment(post_id: int, session: AsyncSession = Depends(get_async_session)):
+@cache(expire=100)
+async def get_comment(post_id: int, session: AsyncSession = Depends(get_async_session),  page: int = 0, limit: int = 50):
     try:
-        stmt = select(Comment, User.username).where(Comment.post_id == post_id).join(User, Comment.author_id == User.id)
+        stmt = select(Comment, User.username).where(Comment.post_id == post_id).join(User, Comment.author_id == User.id).offset(
+            page).limit(limit)
         result = await session.execute(stmt)
         data = []
         for result, username in result.all():

@@ -9,7 +9,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from src.auth.jwt import get_password_hash, verify_password, create_access_token, REFRESH_TOKEN_EXPIRE_DAYS, \
     decode_access_token, get_current_user
 from src.auth.model import User
-from src.auth.shemas import UserCreate, RefreshToken, UserCode, EmailUser, UserCodeReset
+from src.auth.shemas import UserCreate, RefreshToken, UserCode, EmailUser, UserCodeReset, RegisterSuccess, LoginSuccess, \
+    ResponseSuccess, ResponseReset, AccessToken
 from src.auth.utils import random_code
 from src.database import get_async_session
 from src.auth.task import send_email_after_register, send_email_verification, send_email_after_verify, \
@@ -21,7 +22,7 @@ router = APIRouter(
 )
 
 
-@router.post('/register')
+@router.post('/register', response_model=RegisterSuccess)
 async def register_user(data: UserCreate, session: AsyncSession = Depends(get_async_session)):
     try:
         existing_user = await session.execute(select(User).where(User.email == data.email))
@@ -46,7 +47,7 @@ async def register_user(data: UserCreate, session: AsyncSession = Depends(get_as
         raise HTTPException(status_code=500, detail='Неизвестная ошибка')
 
 
-@router.post('/login')
+@router.post('/login', response_model=LoginSuccess)
 async def user_login(form_data: OAuth2PasswordRequestForm = Depends(),
                      session: AsyncSession = Depends(get_async_session)):
     try:
@@ -78,7 +79,7 @@ async def user_login(form_data: OAuth2PasswordRequestForm = Depends(),
         )
 
 
-@router.post('/refresh_token')
+@router.post('/refresh_token', response_model=AccessToken)
 async def refresh(refresh_token: RefreshToken):
     try:
         decoded_token = decode_access_token(refresh_token.refresh_token)
@@ -95,7 +96,7 @@ async def refresh(refresh_token: RefreshToken):
         )
 
 
-@router.post('/verify_email')
+@router.post('/verify_email', response_model=ResponseSuccess)
 async def verify_email(data: EmailUser, session: AsyncSession = Depends(get_async_session)):
     try:
         stmt = select(User).where(User.email == data.email)
@@ -105,13 +106,14 @@ async def verify_email(data: EmailUser, session: AsyncSession = Depends(get_asyn
             random_code(data.email)
             send_email_verification.delay(data.email, redis_connect.get(data.email).decode())
             return {'status': 200}
+        return {'status': 200}
 
 
     except:
-        raise HTTPException(status_code=500)
+        raise HTTPException(status_code=400, detail='123')
 
 
-@router.post('/verify_code')
+@router.post('/verify_code', response_model=ResponseSuccess)
 async def verify_code(data: UserCode, session: AsyncSession = Depends(get_async_session)):
     try:
         if data.code == int(redis_connect.get(data.email).decode()):
@@ -128,21 +130,23 @@ async def verify_code(data: UserCode, session: AsyncSession = Depends(get_async_
         raise HTTPException(status_code=500)
 
 
-@router.post('/forgot_password/')
+@router.post('/forgot_password/', response_model=ResponseSuccess)
 async def forgot_password(data: EmailUser, session: AsyncSession = Depends(get_async_session)):
     try:
         stmt = select(User).where(User.email == data.email)
         result = await session.execute(stmt)
         result = result.scalar()
         if not result:
-            raise HTTPException(status_code=400, detail='Email не найден')
+            return {'status': 200}
+
         random_code(data.email)
         send_email_forgot_password.delay(result.username, result.email, redis_connect.get(data.email).decode())
+        return {'status': 200}
     except:
         raise HTTPException(status_code=500, detail='Неизвестная ошибка')
 
 
-@router.post('/reset_password')
+@router.post('/reset_password', response_model=ResponseReset)
 async def reset_password(data: UserCodeReset, session: AsyncSession = Depends(get_async_session)):
     try:
         if data.code == int(redis_connect.get(data.email).decode()):

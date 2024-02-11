@@ -1,5 +1,6 @@
 import os.path
 import shutil
+import time
 from typing import List, Union, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
@@ -17,7 +18,7 @@ from src.posts.model import Post, Image
 from src.posts.shemas import PostShemas, PostImageResponse, SuccessResponse
 from fastapi_cache.decorator import cache
 from src.posts.utils import user_post
-from src.comment.shemas import ListCommentResponse
+
 
 
 router = APIRouter(
@@ -27,7 +28,7 @@ router = APIRouter(
 
 
 @router.get('', response_model=PostImageResponse)
-@cache(expire=1)
+@cache(expire=100)
 async def get_posts(session: AsyncSession = Depends(get_async_session),
                     page: int = 0, limit: int = 50):
     try:
@@ -68,7 +69,7 @@ async def get_post(post_id: int, session: AsyncSession = Depends(get_async_sessi
         raise HTTPException(status_code=400, detail='Неизвестная ошибка')
 
 
-@router.post('/add_post', response_model=SuccessResponse)
+@router.post('', response_model=SuccessResponse)
 async def add_post(files: List[UploadFile] = File(), new_post: PostShemas = Depends(),
                    session: AsyncSession = Depends(get_async_session),
                    current_user=Depends(get_current_user)):

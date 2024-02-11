@@ -35,3 +35,25 @@ class UserCodeReset(BaseModel):
 
 class EmailUser(BaseModel):
     email: EmailStr
+
+
+
+#response
+class RegisterSuccess(BaseModel):
+    status: int = 200
+    detail: str = 'Регистрация прошла успешно'
+
+class LoginSuccess(BaseModel):
+    access_token: str
+    refresh_token: str
+
+
+class ResponseSuccess(BaseModel):
+    status: int = 200
+
+class ResponseReset(BaseModel):
+    status: int = 200
+    detail: str = 'Ваш пароль успешно сброшен'
+
+class AccessToken(BaseModel):
+    access_token: str
