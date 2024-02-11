@@ -162,8 +162,3 @@ async def reset_password(data: UserCodeReset, session: AsyncSession = Depends(ge
     except:
         raise HTTPException(status_code=500, detail='Неизвестная ошибка')
 
-@router.get('/get_user')
-async def get_user(current_user = Depends(get_current_user), session: AsyncSession = Depends(get_async_session)):
-    stmt = select(User).where(User.email == current_user.email)
-    result = await session.execute(stmt)
-    return {'status': 200, 'data': result.scalar()}
