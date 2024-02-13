@@ -1,9 +1,5 @@
-import os
-import shutil
-import uuid
-
-from fastapi import Depends, HTTPException, File
-from sqlalchemy import select, delete
+from fastapi import Depends, HTTPException
+from sqlalchemy import delete
 
 from sqlalchemy.ext.asyncio import AsyncSession
 

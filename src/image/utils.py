@@ -8,10 +8,9 @@ from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.jwt import get_current_user
-from src.auth.shemas import UserRead
 from src.database import get_async_session
 from src.posts.model import Post, Image
-from src.posts.shemas import PostShemas
+
 
 
 def save_photo(filename: str, image: File):

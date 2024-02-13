@@ -4,13 +4,13 @@ from typing import List
 from src.auth.jwt import get_current_user
 from src.image.utils import author_or_not, delete_image
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
-from sqlalchemy import insert, select, delete
+from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import FileResponse
 
 from src.database import get_async_session
 from src.image.shemas import SuccessResponse, ImageNameSuccess, SuccessImageResponse
-from src.image.utils import generate_filename, save_photo, delete_photo
+from src.image.utils import generate_filename, save_photo
 from src.posts.model import Image
 
 router = APIRouter(

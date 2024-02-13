@@ -1,7 +1,6 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-from starlette.staticfiles import StaticFiles
 from src.comment.router import router as router_comment
 from src.posts.router import router as router_post
 from src.image.router import router as router_image

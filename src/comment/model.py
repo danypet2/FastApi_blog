@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, func, ForeignKey, Table
+from sqlalchemy import Column, Integer, String, DateTime, func, ForeignKey
 
 from src.auth.model import User
 from src.database import Base

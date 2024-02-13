@@ -1,18 +1,10 @@
-import os.path
-import shutil
-import time
-from typing import List, Union, Optional
-
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
-from sqlalchemy import insert, select, delete, update, join
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import insert, select, delete, update, desc
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette.responses import FileResponse
 
 from src.auth.jwt import get_current_user
-from src.auth.model import User
 from src.auth.shemas import UserRead
-from src.comment.model import Comment
-from src.image.utils import generate_filename, save_photo, delete_photo, get_images_post, delete_image
+from src.image.utils import  delete_image
 from src.database import get_async_session
 from src.posts.model import Post, Image
 from src.posts.shemas import PostShemas, SuccessResponse, SuccessResponsePosts, SuccessResponsePost
@@ -30,8 +22,8 @@ router = APIRouter(
 async def get_posts(session: AsyncSession = Depends(get_async_session),
                     page: int = 0, limit: int = 50):
     try:
-        stmt = select(Post, Image.filename).offset(
-            page).limit(limit)
+        stmt = select(Post).offset(
+            page).limit(limit).order_by(desc(Post.data_updated if not Post.data_updated else Post.data_published))
         result = await session.execute(stmt)
         return {'status': 200, 'data': result.scalars().all()}
     except:
