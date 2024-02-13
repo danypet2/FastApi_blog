@@ -10,7 +10,7 @@ from src.auth.jwt import get_password_hash, verify_password, create_access_token
     decode_access_token, get_current_user
 from src.auth.model import User
 from src.auth.shemas import UserCreate, RefreshToken, UserCode, EmailUser, UserCodeReset, RegisterSuccess, LoginSuccess, \
-    ResponseSuccess, ResponseReset, AccessToken
+    ResponseSuccess, ResponseReset, AccessToken, UserGetResponse
 from src.auth.utils import random_code
 from src.database import get_async_session
 from src.auth.task import send_email_after_register, send_email_verification, send_email_after_verify, \
@@ -55,7 +55,7 @@ async def user_login(form_data: OAuth2PasswordRequestForm = Depends(),
         result = await session.execute(user)
         result = result.scalar()
     except:
-        raise HTTPException(status_code=400, detail='Неизвестная ошибка')
+        raise HTTPException(status_code=500, detail='Неизвестная ошибка')
     if not result:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -110,7 +110,7 @@ async def verify_email(data: EmailUser, session: AsyncSession = Depends(get_asyn
 
 
     except:
-        raise HTTPException(status_code=400, detail='123')
+        raise HTTPException(status_code=500, detail='123')
 
 
 @router.post('/verify_code', response_model=ResponseSuccess)
@@ -162,3 +162,22 @@ async def reset_password(data: UserCodeReset, session: AsyncSession = Depends(ge
     except:
         raise HTTPException(status_code=500, detail='Неизвестная ошибка')
 
+
+@router.get('{user_id}', response_model=UserGetResponse)
+async def get_user(user_id: int, session: AsyncSession = Depends(get_async_session)):
+    stmt = select(User.id, User.username, User.email).where(User.id == user_id)
+    result = await session.execute(stmt)
+    result = result.all()
+    if not result:
+        raise HTTPException(status_code=500, detail='Пользователь не найден')
+
+
+    try:
+        user = {}
+        for user_id, user_username, user_email in result:
+            print(user_id, user_username, user_email)
+            user.update({'id': user_id, 'username': user_username, 'email': user_email})
+
+        return {'status': 200, 'data': user}
+    except:
+        raise HTTPException(status_code=500, detail='Неизвестная ошибка')

@@ -18,15 +18,15 @@ class Comment(BaseModel):
     post_id: int
     comment: str
     data_published: datetime
-    username: str
-
-
-class CommentResponse(BaseModel):
-    result: Comment
 
 class ListCommentResponse(BaseModel):
     status: int
-    data: List[CommentResponse]
+    data: List[Comment]
 
 class SuccessResponse(BaseModel):
     status: int = 200
+
+
+class SuccessResponseComment(BaseModel):
+    status: int = 200
+    data: Comment

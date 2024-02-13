@@ -10,6 +10,12 @@ class UserRead(BaseModel):
     is_verified: bool = False
 
 
+class UserGetResponse(BaseModel):
+    id: int
+    email: EmailStr
+    username: constr(min_length=4, max_length=15)
+
+
 class UserCreate(BaseModel):
     email: EmailStr
     username: str
@@ -57,3 +63,13 @@ class ResponseReset(BaseModel):
 
 class AccessToken(BaseModel):
     access_token: str
+
+
+class UserGet(BaseModel):
+    id: int
+    username: str
+    email: EmailStr
+
+class UserGetResponse(BaseModel):
+    status: int = 200
+    data: UserGet

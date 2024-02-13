@@ -3,7 +3,7 @@ import shutil
 import uuid
 
 from fastapi import Depends, HTTPException, File
-from sqlalchemy import select
+from sqlalchemy import select, delete
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -35,6 +35,13 @@ async def get_images_post(post_id: int, session: AsyncSession = Depends(get_asyn
 
 
 
+async def author_or_not(post_id: int, session: AsyncSession = Depends(get_async_session), current_user = Depends(get_current_user)):
+    post = await session.get(Post, post_id)
+    if not post:
+        raise HTTPException(status_code=400, detail='Пост не найден')
+    if not (post.author_id == current_user.id):
+        raise HTTPException(status_code=400, detail='Вы не являетесь автором поста')
+
 def delete_photo(images: list):
     try:
         if images:
@@ -52,3 +59,16 @@ def generate_filename(filename: str):
     if filename.rsplit('.')[-1] in ['jpeg', 'jpg', 'png']:
         return str(uuid.uuid4()) + '.' + filename.rsplit('.')[-1]
     raise HTTPException(status_code=400, detail='Разрешен только jpeg, jpg, png')
+
+
+async def delete_image(post_id: int, session: AsyncSession = Depends(get_async_session)):
+    try:
+        stmt_image_filename = select(Image.filename).where(Image.post_id == post_id)
+        image_filename = await session.execute(stmt_image_filename)
+        image_filenames = image_filename.scalars().all()
+        delete_photo(image_filenames)
+        stmt = delete(Image).where(Image.post_id == post_id)
+        await session.execute(stmt)
+        await session.commit()
+    except:
+        raise HTTPException(status_code=500, detail='Неизвестная ошибка')

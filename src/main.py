@@ -4,6 +4,7 @@ from fastapi_cache.backends.redis import RedisBackend
 from starlette.staticfiles import StaticFiles
 from src.comment.router import router as router_comment
 from src.posts.router import router as router_post
+from src.image.router import router as router_image
 from redis import asyncio as aioredis
 from fastapi.middleware.cors import CORSMiddleware
 from src.auth.router import router as auth_router
@@ -16,6 +17,7 @@ app = FastAPI(title='social_netw')
 app.include_router(router_post)
 app.include_router(auth_router)
 app.include_router(router_comment)
+app.include_router(router_image)
 
 
 @app.on_event("startup")

@@ -18,17 +18,16 @@ class PostResponse(BaseModel):
     id: int
     data_updated: Optional[datetime] = None
     data_published: Optional[datetime] = None
-    username: str
 
+class SuccessResponsePosts(BaseModel):
+    status: int = 200
+    data: List[PostResponse]
 
-class PostImage(BaseModel):
-    post: PostResponse
-    images: List[Optional[str]] = None
-
-class PostImageResponse(BaseModel):
-    status: int
-    data: List[PostImage]
+class SuccessResponsePost(BaseModel):
+    status: int = 200
+    data: PostResponse
 
 
 class SuccessResponse(BaseModel):
     status: int = 200
+
