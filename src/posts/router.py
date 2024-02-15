@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import insert, select, delete, update, desc
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.functions import coalesce
 
 from src.auth.jwt import get_current_user
 from src.auth.shemas import UserRead
@@ -23,7 +24,7 @@ async def get_posts(session: AsyncSession = Depends(get_async_session),
                     page: int = 0, limit: int = 50):
     try:
         stmt = select(Post).offset(
-            page).limit(limit).order_by(desc(Post.data_updated if not Post.data_updated else Post.data_published))
+            page).limit(limit).order_by(desc(coalesce(Post.data_updated, Post.data_published)))
         result = await session.execute(stmt)
         return {'status': 200, 'data': result.scalars().all()}
     except:

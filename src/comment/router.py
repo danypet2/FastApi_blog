@@ -1,8 +1,10 @@
 from fastapi import Depends, HTTPException
 from fastapi.routing import APIRouter
-from sqlalchemy import insert, select, update, delete, desc
+from sqlalchemy import insert, select, update, delete, desc, nullslast
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi_cache.decorator import cache
+from sqlalchemy.sql.functions import coalesce
+
 from src.auth.model import User
 from src.auth.jwt import get_current_user
 from src.comment.model import Comment
@@ -20,7 +22,8 @@ router = APIRouter(
 async def add_comment(post_id: int, comment: CommentShemas, session: AsyncSession = Depends(get_async_session),
                       current_user=Depends(get_current_user)):
     try:
-        stmt = insert(Comment).values(comment=comment.comment, author_id=current_user.id, post_id=post_id).returning(Comment)
+        stmt = insert(Comment).values(comment=comment.comment, author_id=current_user.id, post_id=post_id).returning(
+            Comment)
         result = await session.execute(stmt)
         await session.commit()
         return {'status': 200, 'data': result.scalar()}
@@ -28,12 +31,16 @@ async def add_comment(post_id: int, comment: CommentShemas, session: AsyncSessio
         raise HTTPException(status_code=500, detail='Неизвестная ошибка')
 
 
-@router.get('/{post_id}', dependencies=[Depends(post_or_not)]  ,response_model=ListCommentResponse)
-@cache(expire=1)
-async def get_comment(post_id: int, session: AsyncSession = Depends(get_async_session),  page: int = 0, limit: int = 50):
+@router.get('/{post_id}', dependencies=[Depends(post_or_not)], response_model=ListCommentResponse)
+@cache(expire=100)
+async def get_comment(post_id: int, session: AsyncSession = Depends(get_async_session), page: int = 0, limit: int = 50):
     try:
         stmt = select(Comment).where(Comment.post_id == post_id).offset(
-            page).limit(limit).order_by(desc(Comment.data_updated if not Comment.data_updated else Comment.data_published))
+            page).limit(limit).order_by(
+            desc(
+                coalesce(Comment.data_updated, Comment.data_published)
+            )
+        )
         result = await session.execute(stmt)
         await session.commit()
         return {'status': 200, 'data': result.scalars().all()}
