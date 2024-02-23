@@ -18,7 +18,7 @@ from src.auth.task import send_email_after_register, send_email_verification, se
 
 router = APIRouter(
     prefix='/auth',
-    tags=['auth']
+    tags=['Auth']
 )
 
 
@@ -171,11 +171,9 @@ async def get_user(user_id: int, session: AsyncSession = Depends(get_async_sessi
     if not result:
         raise HTTPException(status_code=500, detail='Пользователь не найден')
 
-
     try:
         user = {}
         for user_id, user_username, user_email in result:
-            print(user_id, user_username, user_email)
             user.update({'id': user_id, 'username': user_username, 'email': user_email})
 
         return {'status': 200, 'data': user}

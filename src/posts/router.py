@@ -13,8 +13,8 @@ from fastapi_cache.decorator import cache
 from src.posts.utils import post_or_not, delete_comment, author_or_not
 
 router = APIRouter(
-    prefix='/posts',
-    tags=['Posts']
+    prefix='/post',
+    tags=['Post']
 )
 
 

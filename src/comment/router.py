@@ -13,8 +13,8 @@ from src.comment.utils import post_or_not, author_or_read_only
 from src.database import get_async_session
 
 router = APIRouter(
-    prefix='/comments',
-    tags=['Comments']
+    prefix='/comment',
+    tags=['Comment']
 )
 
 

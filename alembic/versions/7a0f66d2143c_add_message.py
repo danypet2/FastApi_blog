@@ -1,8 +1,8 @@
-"""add model comment
+"""add message
 
-Revision ID: bf6fa345f880
+Revision ID: 7a0f66d2143c
 Revises: 
-Create Date: 2024-02-05 18:44:39.998752
+Create Date: 2024-02-18 16:20:11.182262
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'bf6fa345f880'
+revision: str = '7a0f66d2143c'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -33,6 +33,18 @@ def upgrade() -> None:
     sa.UniqueConstraint('username')
     )
     op.create_index(op.f('ix_user_id'), 'user', ['id'], unique=False)
+    op.create_table('message',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('to_user_id', sa.Integer(), nullable=False),
+    sa.Column('content', sa.String(length=3000), nullable=False),
+    sa.Column('data_send', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+    sa.Column('data_updated', sa.DateTime(timezone=True), nullable=True),
+    sa.ForeignKeyConstraint(['to_user_id'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_message_id'), 'message', ['id'], unique=False)
     op.create_table('post',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('title', sa.String(length=40), nullable=False),
@@ -75,6 +87,8 @@ def downgrade() -> None:
     op.drop_table('comment')
     op.drop_index(op.f('ix_post_id'), table_name='post')
     op.drop_table('post')
+    op.drop_index(op.f('ix_message_id'), table_name='message')
+    op.drop_table('message')
     op.drop_index(op.f('ix_user_id'), table_name='user')
     op.drop_table('user')
     # ### end Alembic commands ###
