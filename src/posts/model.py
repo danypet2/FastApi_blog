@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from src.auth.model import User
@@ -17,11 +18,9 @@ class Post(Base):
 
 
 
-class Image(Base):
-    __tablename__ = 'image'
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    filename = Column(String)
-    post_id = Column(Integer, ForeignKey(Post.id), nullable=True)
+
+
+
 
 
 

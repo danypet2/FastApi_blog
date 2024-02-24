@@ -18,6 +18,7 @@ app.include_router(auth_router)
 app.include_router(router_comment)
 app.include_router(router_image)
 app.include_router(router_message)
+# app.include_router(router_popularity)
 
 @app.on_event("startup")
 async def startup():

@@ -9,7 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.jwt import get_current_user
 from src.database import get_async_session
-from src.posts.model import Post, Image
+from src.posts.model import Post
+from src.image.model import Image
 
 
 

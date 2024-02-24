@@ -3,6 +3,7 @@ from src.posts.model import *
 from src.auth.model import *
 from src.comment.model import *
 from src.message.model import *
+from src.popularity.model import *
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 

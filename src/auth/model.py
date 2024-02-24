@@ -3,6 +3,7 @@ from fastapi_users.db import SQLAlchemyBaseUserTable
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from sqlalchemy import Column, String, Integer, DateTime, func, JSON, ForeignKey, Boolean
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.database import Base, get_async_session
 
 
@@ -23,6 +24,8 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     is_active = Column(Boolean, default=True, nullable=False)
     is_superuser = Column(Boolean, default=False, nullable=False)
     is_verified = Column(Boolean, default=False, nullable=False)
+
+
 
 
 

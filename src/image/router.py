@@ -11,7 +11,7 @@ from starlette.responses import FileResponse
 from src.database import get_async_session
 from src.image.shemas import SuccessResponse, ImageNameSuccess, SuccessImageResponse
 from src.image.utils import generate_filename, save_photo
-from src.posts.model import Image
+from src.image.model import Image
 
 router = APIRouter(
     prefix='/image',
