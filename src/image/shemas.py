@@ -17,6 +17,7 @@ class ImageName(BaseModel):
     id: int
     post_id: int
 
+
 class ImageNameSuccess(BaseModel):
     status: int = 200
     data: List[ImageName]

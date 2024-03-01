@@ -8,12 +8,10 @@ from src.auth.shemas import UserRead
 from src.comment.model import Comment
 from src.database import get_async_session
 from src.posts.model import Post
-from src.image.model import Image
-from src.posts.shemas import PostShemas
 
 
 async def author_or_not(post_id: int, session: AsyncSession = Depends(get_async_session),
-                    current_user: UserRead = Depends(get_current_user)):
+                        current_user: UserRead = Depends(get_current_user)):
     post = await session.get(Post, post_id)
     if not post:
         raise HTTPException(status_code=400, detail='Данный пост не найден')
@@ -22,7 +20,7 @@ async def author_or_not(post_id: int, session: AsyncSession = Depends(get_async_
 
 
 async def post_or_not(post_id: int, session: AsyncSession = Depends(get_async_session),
-                    current_user: UserRead = Depends(get_current_user)):
+                      current_user: UserRead = Depends(get_current_user)):
     post = await session.get(Post, post_id)
     if not post:
         raise HTTPException(status_code=400, detail='Данный пост не найден')
@@ -35,4 +33,3 @@ async def delete_comment(post_id: int, session: AsyncSession = Depends(get_async
         await session.commit()
     except:
         raise HTTPException(status_code=500, detail='Неизвестная ошибка')
-

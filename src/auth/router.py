@@ -7,7 +7,7 @@ from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.security import OAuth2PasswordRequestForm
 from src.auth.jwt import get_password_hash, verify_password, create_access_token, REFRESH_TOKEN_EXPIRE_DAYS, \
-    decode_access_token, get_current_user
+    decode_access_token
 from src.auth.model import User
 from src.auth.shemas import UserCreate, RefreshToken, UserCode, EmailUser, UserCodeReset, RegisterSuccess, LoginSuccess, \
     ResponseSuccess, ResponseReset, AccessToken, UserGetResponse
@@ -124,7 +124,7 @@ async def verify_code(data: UserCode, session: AsyncSession = Depends(get_async_
             send_email_after_verify.delay(user_email=data.email)
             return {'status': 200}
         else:
-            return {'status': 400}
+            return {'status': 500}
 
     except:
         raise HTTPException(status_code=500)

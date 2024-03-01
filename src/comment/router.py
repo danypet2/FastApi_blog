@@ -1,11 +1,10 @@
 from fastapi import Depends, HTTPException
 from fastapi.routing import APIRouter
-from sqlalchemy import insert, select, update, delete, desc, nullslast
+from sqlalchemy import insert, select, update, delete, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi_cache.decorator import cache
 from sqlalchemy.sql.functions import coalesce
 
-from src.auth.model import User
 from src.auth.jwt import get_current_user
 from src.comment.model import Comment
 from src.comment.shemas import CommentShemas, ListCommentResponse, SuccessResponse, SuccessResponseComment

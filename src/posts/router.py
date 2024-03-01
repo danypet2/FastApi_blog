@@ -11,8 +11,6 @@ from src.posts.model import Post
 from src.posts.shemas import PostShemas, SuccessResponse, SuccessResponsePosts, SuccessResponsePost
 from fastapi_cache.decorator import cache
 from src.posts.utils import post_or_not, delete_comment, author_or_not
-from src.image.model import Image
-
 
 router = APIRouter(
     prefix='/post',
@@ -59,7 +57,8 @@ async def add_post(new_post: PostShemas,
         raise HTTPException(status_code=500, detail='Неизвестная ошибка')
 
 
-@router.delete('/{post_id}', dependencies=[Depends(author_or_not), Depends(delete_image), Depends(delete_comment)], response_model=SuccessResponse)
+@router.delete('/{post_id}', dependencies=[Depends(author_or_not), Depends(delete_image), Depends(delete_comment)],
+               response_model=SuccessResponse)
 async def delete_post(post_id: int, session: AsyncSession = Depends(get_async_session),
                       current_user: UserRead = Depends(get_current_user),
                       ):

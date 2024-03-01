@@ -1,9 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import insert, select, desc, union_all, text, union, update, or_, and_, join, outerjoin, false, delete
+from sqlalchemy import insert, update, delete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-from sqlalchemy.sql.functions import coalesce
 from sqlalchemy.sql import text
 
 from src.auth.jwt import get_current_user
@@ -71,11 +69,12 @@ async def put_message(message_id: int, message: MessageShemas, session: AsyncSes
 
 
 @router.delete('{message_id}', dependencies=[Depends(author_or_read_only)], response_model=SuccessResponse)
-async def delete_message(message_id: int, session: AsyncSession = Depends(get_async_session), current_user=Depends(get_current_user)):
+async def delete_message(message_id: int, session: AsyncSession = Depends(get_async_session),
+                         current_user=Depends(get_current_user)):
     try:
         stmt = delete(Message).where(Message.id == message_id)
         await session.execute(stmt)
         await session.commit()
-        return {'status':200}
+        return {'status': 200}
     except:
         raise HTTPException(status_code=500, detail='Неизвестная ошибка')

@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from datetime import datetime
 
 
-
 #request
 class CommentShemas(BaseModel):
     comment: str
@@ -19,9 +18,11 @@ class Comment(BaseModel):
     comment: str
     data_published: datetime
 
+
 class ListCommentResponse(BaseModel):
     status: int
     data: List[Comment]
+
 
 class SuccessResponse(BaseModel):
     status: int = 200

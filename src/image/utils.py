@@ -13,7 +13,6 @@ from src.posts.model import Post
 from src.image.model import Image
 
 
-
 def save_photo(filename: str, image: File):
     try:
         upload_dir = os.path.join(os.getcwd(), 'static')
@@ -34,13 +33,14 @@ async def get_images_post(post_id: int, session: AsyncSession = Depends(get_asyn
     return image_filenames
 
 
-
-async def author_or_not(post_id: int, session: AsyncSession = Depends(get_async_session), current_user = Depends(get_current_user)):
+async def author_or_not(post_id: int, session: AsyncSession = Depends(get_async_session),
+                        current_user=Depends(get_current_user)):
     post = await session.get(Post, post_id)
     if not post:
         raise HTTPException(status_code=400, detail='Пост не найден')
     if not (post.author_id == current_user.id):
         raise HTTPException(status_code=400, detail='Вы не являетесь автором поста')
+
 
 def delete_photo(images: list):
     try:

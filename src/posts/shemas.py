@@ -3,13 +3,14 @@ from typing import List, Optional
 from pydantic import BaseModel
 from datetime import datetime
 
-#request
+
+# request
 class PostShemas(BaseModel):
     title: str
     content: str
 
 
-#response
+# response
 class PostResponse(BaseModel):
     title: str
     author_id: int
@@ -18,9 +19,11 @@ class PostResponse(BaseModel):
     data_updated: Optional[datetime] = None
     data_published: Optional[datetime] = None
 
+
 class SuccessResponsePosts(BaseModel):
     status: int = 200
     data: List[PostResponse]
+
 
 class SuccessResponsePost(BaseModel):
     status: int = 200
@@ -29,4 +32,3 @@ class SuccessResponsePost(BaseModel):
 
 class SuccessResponse(BaseModel):
     status: int = 200
-
