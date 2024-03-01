@@ -115,19 +115,21 @@ async def verify_email(data: EmailUser, session: AsyncSession = Depends(get_asyn
 
 @router.post('/verify_code', response_model=ResponseSuccess)
 async def verify_code(data: UserCode, session: AsyncSession = Depends(get_async_session)):
-    try:
-        if data.code == int(redis_connect.get(data.email).decode()):
-            redis_connect.delete(data.email, data.code)
+    if not redis_connect.get(data.email):
+        return {'status': 200}
+    if data.code == int(redis_connect.get(data.email).decode()):
+        redis_connect.delete(data.email, data.code)
+        try:
             stmt = update(User).where(User.email == data.email).values(is_verified=True)
             await session.execute(stmt)
             await session.commit()
             send_email_after_verify.delay(user_email=data.email)
             return {'status': 200}
-        else:
-            return {'status': 500}
+        except:
+            raise HTTPException(status_code=500, detail='Неизвестная ошибка')
+    elif not (data.code == int(redis_connect.get(data.email).decode())):
+        raise HTTPException(status_code=401, detail='Код недействителен')
 
-    except:
-        raise HTTPException(status_code=500)
 
 
 @router.post('/forgot_password/', response_model=ResponseSuccess)
@@ -148,19 +150,22 @@ async def forgot_password(data: EmailUser, session: AsyncSession = Depends(get_a
 
 @router.post('/reset_password', response_model=ResponseReset)
 async def reset_password(data: UserCodeReset, session: AsyncSession = Depends(get_async_session)):
-    try:
-        if data.code == int(redis_connect.get(data.email).decode()):
+    if not redis_connect.get(data.email):
+        return {'status': 200}
+    if data.code == int(redis_connect.get(data.email).decode()):
+        try:
             redis_connect.delete(data.email)
             stmt = update(User).where(User.email == data.email).values(
                 hashed_password=get_password_hash(data.new_password))
             await session.execute(stmt)
-            await  session.commit()
+            await session.commit()
             send_email_after_reset_password.delay(data.email)
             return {'status': 200, 'detail': 'Ваш пароль успешно сброшен'}
-        else:
-            return dict(status_code=400, detail='Неправильный код доступа')
-    except:
-        raise HTTPException(status_code=500, detail='Неизвестная ошибка')
+        except:
+            raise HTTPException(status_code=500, detail='Неизвестная ошибка')
+    elif not (data.code == int(redis_connect.get(data.email).decode())):
+        raise HTTPException(status_code=401, detail='Неправильный код доступа')
+
 
 
 @router.get('{user_id}', response_model=UserGetResponse)

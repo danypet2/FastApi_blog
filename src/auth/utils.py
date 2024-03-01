@@ -1,6 +1,7 @@
 import random
 import redis
 
+from src.config import REDIS_HOST, REDIS_PORT
 
 
 def random_code(email_user, expire_minutes=5):
@@ -11,4 +12,4 @@ def random_code(email_user, expire_minutes=5):
 
 
 
-redis_connect = redis.Redis(host='localhost', port=6379, db=0)
+redis_connect = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)
